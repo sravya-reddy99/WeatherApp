@@ -29,3 +29,18 @@ export const getWeatherData = async (city) => {
     
     return await response.json();
 };
+
+export const getWeatherByCoordinates = async (lat, lon) => {
+    try {
+        const url = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&units=metric&appid=${WEATHER_API_KEY}`;
+        const response = await fetch(url);
+
+        if (!response.ok) throw new Error('Failed to fetch weather data by coordinates.');
+
+        return await response.json();
+    } catch (error) {
+        console.error("Error fetching weather data by coordinates:", error);
+        throw error;
+    }
+};
+  

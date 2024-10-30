@@ -79,7 +79,7 @@ body {
 
 .search-box input {
     width: 100%;
-    padding: 10px 40px 10px 35px;
+    padding: 10px 40px 10px 10px;
     border: 1px solid #e0e0e0;
     border-radius: 8px;
     font-size: 14px;
@@ -448,4 +448,28 @@ body {
     .hourly-forecast {
         grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
     }
+}
+
+.currentLocation {
+    background: #2a5298;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    padding: 5px;
+}
+
+.orText {
+    margin-top: 40px;
+}
+
+.button-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 10%;
 }

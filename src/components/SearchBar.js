@@ -1,8 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Search } from 'lucide-react';
 
-// Handles city search with autocomplete suggestions
-const SearchBar = ({ onSearch, searchCities, selectedCity }) => {
+const SearchBar = ({ onSearch, searchCities, selectedCity, currentLocation }) => {
   const [searchText, setSearchText] = useState('');
   const [suggestions, setSuggestions] = useState([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
@@ -12,18 +11,20 @@ const SearchBar = ({ onSearch, searchCities, selectedCity }) => {
   const inputRef = useRef(null);
   const searchTimeout = useRef(null);
 
-  // Updates search input when a city is selected from recent searches
   useEffect(() => {
     if (selectedCity) {
       setSearchText(selectedCity);
     }
   }, [selectedCity]);
 
-  // Closes suggestion dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
-      if (suggestionsRef.current && !suggestionsRef.current.contains(event.target) && 
-          inputRef.current && !inputRef.current.contains(event.target)) {
+      if (
+        suggestionsRef.current &&
+        !suggestionsRef.current.contains(event.target) &&
+        inputRef.current &&
+        !inputRef.current.contains(event.target)
+      ) {
         setShowSuggestions(false);
       }
     };
@@ -37,7 +38,6 @@ const SearchBar = ({ onSearch, searchCities, selectedCity }) => {
     };
   }, []);
 
-  // Handles input changes and fetches city suggestions
   const handleInputChange = async (e) => {
     const value = e.target.value;
     setSearchText(value);
@@ -68,14 +68,12 @@ const SearchBar = ({ onSearch, searchCities, selectedCity }) => {
     }
   };
 
-  // Shows suggestions when input is focused
   const handleInputFocus = () => {
     if (searchText.length >= 3) {
       setShowSuggestions(true);
     }
   };
 
-  // Handles city selection from suggestions
   const handleSuggestionClick = (city) => {
     const cityName = `${city.city}, ${city.countryCode}`;
     setSearchText(cityName);
@@ -83,7 +81,6 @@ const SearchBar = ({ onSearch, searchCities, selectedCity }) => {
     onSearch(cityName);
   };
 
-  // Handles form submission
   const handleSubmit = (e) => {
     e.preventDefault();
     if (searchText.trim()) {
@@ -94,7 +91,12 @@ const SearchBar = ({ onSearch, searchCities, selectedCity }) => {
 
   return (
     <div className="search-container">
-      <h2>Search Location</h2>
+      <div className="button-container"><button className="currentLocation" onClick={currentLocation}>
+        Use Current Location
+      </button>
+      </div>
+      <div className="button-container"><h2 className='orText'>OR</h2></div>
+      <h2 className='orText'>Search Location</h2>
       <form onSubmit={handleSubmit} className="search-box">
         <input
           ref={inputRef}
@@ -110,13 +112,10 @@ const SearchBar = ({ onSearch, searchCities, selectedCity }) => {
         </button>
       </form>
       
-      {/* Renders suggestions dropdown with loading and empty states */}
       {showSuggestions && (
         <div ref={suggestionsRef} className="suggestions-box">
           {isLoading ? (
-            <div className="suggestion-item">
-              <div className="city-name">Loading...</div>
-            </div>
+            <div className="suggestion-item">Loading...</div>
           ) : suggestions.length > 0 ? (
             suggestions.map((city, index) => (
               <div
@@ -131,9 +130,7 @@ const SearchBar = ({ onSearch, searchCities, selectedCity }) => {
               </div>
             ))
           ) : (
-            <div className="suggestion-item">
-              <div className="city-name">No cities found</div>
-            </div>
+            <div className="suggestion-item">No cities found</div>
           )}
         </div>
       )}

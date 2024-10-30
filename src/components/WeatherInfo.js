@@ -1,19 +1,17 @@
 import React, { useEffect } from 'react';
 
-// Displays detailed weather information including current conditions and hourly forecast
 const WeatherInfo = ({ data }) => {
-  const firstDay = data.list[0];
-  const cityName = data.city.name;
-  const country = data.city.country;
-
-  // Updates background based on weather conditions and time of day
   useEffect(() => {
+    if (!data || !data.list || data.list.length === 0) return;
+
+    const firstDay = data.list[0];
     const weatherId = firstDay.weather[0].id;
     const icon = firstDay.weather[0].icon;
     const isNight = icon.includes('n');
     const backgroundOverlay = document.querySelector('.background-overlay');
-    
+
     backgroundOverlay.className = 'background-overlay';
+
     if (isNight) {
       backgroundOverlay.classList.add('background-night');
     } else if (weatherId >= 200 && weatherId < 300) {
@@ -27,11 +25,24 @@ const WeatherInfo = ({ data }) => {
     } else {
       backgroundOverlay.classList.add('background-clear');
     }
-  }, [firstDay]);
+  }, [data]);
+
+  // Display a landing message until data is loaded
+  if (!data || !data.list || !data.city) {
+    return (
+      <div className="landing-message">
+        <h2>Welcome to the Weather App</h2>
+        <p>Enter a city name or use your current location to view the latest weather updates.</p>
+      </div>
+    );
+  }
+
+  const firstDay = data.list[0];
+  const cityName = data.city.name;
+  const country = data.city.country;
 
   return (
     <>
-      {/* Main weather card showing current conditions */}
       <div className="weather-grid">
         <div className="main-weather weather-card">
           <h2>{cityName}, {country}</h2>
@@ -44,7 +55,6 @@ const WeatherInfo = ({ data }) => {
           <div className="feels-like">Feels like {Math.round(firstDay.main.feels_like)}°C</div>
         </div>
 
-        {/* Grid of weather metrics */}
         <div className="metrics-grid">
           {[
             { icon: 'water', label: 'Humidity', value: `${firstDay.main.humidity}%` },
@@ -63,7 +73,6 @@ const WeatherInfo = ({ data }) => {
         </div>
       </div>
 
-      {/* Hourly forecast section */}
       <div className="forecast-section">
         <div className="forecast-header">
           <h2>Hourly Forecast</h2>
