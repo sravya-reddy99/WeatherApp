@@ -27,8 +27,8 @@ A simple and responsive weather application built with React. This app allows us
 
 **Clone the repository**:
 
-   git clone https://github.com/your-username/Weather-App.git
-   cd Weather-App
+   git clone https://github.com/your-username/WeatherApp.git
+   cd WeatherApp
 
 ### Install dependencies:
 
