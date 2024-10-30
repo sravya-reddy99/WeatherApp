@@ -90,13 +90,14 @@ const SearchBar = ({ onSearch, searchCities, selectedCity, currentLocation }) =>
   };
 
   return (
-    <div className="search-container">
+      <>
       <div className="button-container"><button className="currentLocation" onClick={currentLocation}>
         Use Current Location
       </button>
       </div>
-      <div className="button-container"><h2 className='orText'>OR</h2></div>
-      <h2 className='orText'>Search Location</h2>
+      <div className="button-container"><h2>OR</h2></div>
+      <div className="search-container">
+      <h2>Search Location</h2>
       <form onSubmit={handleSubmit} className="search-box">
         <input
           ref={inputRef}
@@ -135,6 +136,7 @@ const SearchBar = ({ onSearch, searchCities, selectedCity, currentLocation }) =>
         </div>
       )}
     </div>
+    </>
   );
 };
 
