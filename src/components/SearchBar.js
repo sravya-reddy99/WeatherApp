@@ -95,7 +95,7 @@ const SearchBar = ({ onSearch, searchCities, selectedCity, currentLocation }) =>
         Use Current Location
       </button>
       </div>
-      <div className="button-container"><h2>OR</h2></div>
+      <div className="button-container" style={{'height': '1%'}}><h2>OR</h2></div>
       <div className="search-container">
       <h2>Search Location</h2>
       <form onSubmit={handleSubmit} className="search-box">
