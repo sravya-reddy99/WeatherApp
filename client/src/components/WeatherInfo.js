@@ -44,15 +44,15 @@ const WeatherInfo = ({ data }) => {
   const country = data.city.country;
 
   const windKmh = Math.round((firstDay.wind?.speed ?? 0) * 3.6); // m/s -> km/h
-  const visibilityKm =
-    typeof firstDay.visibility === 'number'
-      ? `${(firstDay.visibility / 1000).toFixed(1)} km`
-      : '—';
+  // const visibilityKm =
+  //   typeof firstDay.visibility === 'number'
+  //     ? `${(firstDay.visibility / 1000).toFixed(1)} km`
+  //     : '—';
 
-  const popPct =
-    typeof firstDay.pop === 'number'
-      ? `${Math.round(firstDay.pop * 100)}%`
-      : '—';
+  // const popPct =
+  //   typeof firstDay.pop === 'number'
+  //     ? `${Math.round(firstDay.pop * 100)}%`
+  //     : '—';
 
   return (
     <>
@@ -73,9 +73,9 @@ const WeatherInfo = ({ data }) => {
             { icon: 'water', label: 'Humidity', value: `${firstDay.main.humidity}%` },
             { icon: 'wind', label: 'Wind Speed', value: `${windKmh} km/h` },
             { icon: 'compress-arrows-alt', label: 'Pressure', value: `${firstDay.main.pressure} hPa` },
-            { icon: 'eye', label: 'Visibility', value: visibilityKm },
+            // { icon: 'eye', label: 'Visibility', value: visibilityKm },
             { icon: 'cloud', label: 'Cloud Cover', value: `${firstDay.clouds.all}%` },
-            { icon: 'tint', label: 'Chance of Rain', value: popPct }
+            // { icon: 'tint', label: 'Chance of Rain', value: popPct }
           ].map((metric, index) => (
             <div key={index} className="metric-card">
               <i className={`fas fa-${metric.icon} metric-icon`}></i>
