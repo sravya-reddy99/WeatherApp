@@ -21,6 +21,7 @@ const WeatherApp = () => {
 
   // This allows Actions to trigger a message inside WeatherAgent
   const agentRef = useRef(null);
+  const overlayRef = useRef(null);
 
   const handleWeatherSearch = async (city) => {
     setLoading(true);
@@ -88,7 +89,7 @@ const WeatherApp = () => {
   const addToRecentSearches = (cityName) => {
     setRecentSearches((prev) => {
       const filtered = prev.filter((city) => city !== cityName);
-      const updated = [cityName, ...filtered].slice(0, 5);
+      const updated = [cityName, ...filtered].slice(0, 8);
       localStorage.setItem('recentSearches', JSON.stringify(updated));
       return updated;
     });
@@ -116,8 +117,8 @@ const WeatherApp = () => {
   }, []);
 
   return (
-    <div className="min-h-screen bg-[#1a1a2e]">
-      <div className="background-overlay" />
+    <div className="min-h-screen">
+      <div className="background-overlay" ref={overlayRef}/>
       <div className="dashboard">
         {/* LEFT SIDEBAR */}
         <div className="sidebar">
@@ -156,7 +157,7 @@ const WeatherApp = () => {
             <div className="main-layout">
               {/* LEFT SIDE: WEATHER + CHARTS + HOURLY */}
               <div>
-                {weatherData && <WeatherInfo data={weatherData} />}
+                {weatherData && <WeatherInfo data={weatherData} overlayRef={overlayRef}/>}
               </div>
 
               {/* RIGHT SIDE: UTILITY RAIL */}
@@ -176,9 +177,9 @@ const WeatherApp = () => {
                 </div>
 
                 {/* 3) Insights */}
-                <div className="rail-card insights-card">
+                {/* <div className="rail-card insights-card">
                   <WeatherInsights weatherData={weatherData} />
-                </div>
+                </div> */}
               </div>
             </div>
           )}
