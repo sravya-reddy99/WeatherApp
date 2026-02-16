@@ -89,7 +89,7 @@ const WeatherApp = () => {
   const addToRecentSearches = (cityName) => {
     setRecentSearches((prev) => {
       const filtered = prev.filter((city) => city !== cityName);
-      const updated = [cityName, ...filtered].slice(0, 8);
+      const updated = [cityName, ...filtered].slice(0, 5);
       localStorage.setItem('recentSearches', JSON.stringify(updated));
       return updated;
     });

@@ -92,147 +92,205 @@
 }
 
 /* =========================================================
-   YOUR EXISTING EFFECTS (kept, slightly adjusted to not fight ::after grain)
-   NOTE: we will use ::before for the weather effect layers.
+   EFFECT LAYERS (use ::before)
+   - Rain = droplets only
+   - Snow = flakes via ::before (NO HTML change needed)
    ========================================================= */
 
 /* ---------------------------
-   CLEAR: soft sun-glow shimmer
+   CLEAR: sun bloom + gentle shimmer
 ---------------------------- */
 .background-overlay.background-clear::before {
+  content: "";
+  position: fixed;
+  inset: -25%;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.45;
+  background:
+    radial-gradient(circle at 22% 18%, rgba(255,255,255,0.38), transparent 52%),
+    radial-gradient(circle at 18% 14%, rgba(255,240,200,0.32), transparent 45%),
+    radial-gradient(circle at 70% 30%, rgba(255,255,255,0.14), transparent 60%);
+  filter: blur(0.8px);
+  animation: clearGlow 7s ease-in-out infinite;
+}
+
+@keyframes clearGlow {
+  0%, 100% { transform: translate3d(0,0,0) scale(1); opacity: 0.34; }
+  50%      { transform: translate3d(14px,-10px,0) scale(1.03); opacity: 0.52; }
+}
+
+/* ---------------------------
+   CLOUDS: layered drifting fog blobs
+---------------------------- */
+.background-overlay.background-clouds::before{
+  content: "";
+  position: fixed;
+  inset: -35%;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.30;
+  filter: blur(22px);
+  background:
+    radial-gradient(circle at 18% 42%, rgba(255,255,255,0.50), transparent 58%),
+    radial-gradient(circle at 52% 32%, rgba(255,255,255,0.26), transparent 62%),
+    radial-gradient(circle at 78% 52%, rgba(255,255,255,0.34), transparent 60%),
+    radial-gradient(circle at 40% 65%, rgba(210,230,255,0.18), transparent 62%);
+  animation: cloudsDrift 22s linear infinite;
+}
+
+@keyframes cloudsDrift {
+  0%   { transform: translate3d(-7%, 0, 0); }
+  50%  { transform: translate3d( 4%, -1%, 0); }
+  100% { transform: translate3d( 7%, 0, 0); }
+}
+
+/* ---------------------------
+   RAIN: droplets only (no lines)
+---------------------------- */
+.background-overlay.background-rain::before{
   content: "";
   position: fixed;
   inset: -20%;
   pointer-events: none;
   z-index: 0;
-  opacity: 0.35;
-  background:
-    radial-gradient(circle at 20% 18%, rgba(255,255,255,0.35), transparent 55%),
-    radial-gradient(circle at 78% 30%, rgba(255,255,255,0.18), transparent 60%);
-  filter: blur(0.6px);
-  animation: clearGlow 6s ease-in-out infinite;
-}
+  opacity: 0.65;
 
-@keyframes clearGlow {
-  0%, 100% { transform: translate3d(0,0,0) scale(1); opacity: 0.25; }
-  50%      { transform: translate3d(10px,-10px,0) scale(1.02); opacity: 0.40; }
-}
-
-/* ---------------------------
-   CLOUDS: slow drifting fog layers
----------------------------- */
-.background-overlay.background-clouds::before{
-  content: "";
-  position: fixed;
-  inset: -30%;
-  pointer-events: none;
-  z-index: 0;
-  opacity: 0.28;
-  filter: blur(18px);
-  background:
-    radial-gradient(circle at 20% 40%, rgba(255,255,255,0.45), transparent 55%),
-    radial-gradient(circle at 55% 35%, rgba(255,255,255,0.25), transparent 60%),
-    radial-gradient(circle at 75% 55%, rgba(255,255,255,0.35), transparent 58%);
-  animation: cloudsDrift1 18s linear infinite;
-}
-
-@keyframes cloudsDrift1 {
-  0%   { transform: translate3d(-6%, 0, 0); }
-  100% { transform: translate3d( 6%, 0, 0); }
-}
-
-/* ---------------------------
-   RAIN: droplets + streaks
-   (We keep streaks on ::before to avoid colliding with the grain ::after)
----------------------------- */
-.background-overlay.background-rain::before{
-  content: "";
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  z-index: 0;
-  opacity: 0.40;
   background-image:
-    repeating-linear-gradient(
-      115deg,
-      rgba(255,255,255,0.18) 0px,
-      rgba(255,255,255,0.18) 1px,
-      transparent 1px,
-      transparent 10px
-    );
-  filter: blur(0.4px);
-  animation: rainStreaksFall 0.9s linear infinite;
+    radial-gradient(circle, rgba(255,255,255,0.32) 0 1.6px, transparent 2.8px),
+    radial-gradient(circle, rgba(255,255,255,0.22) 0 1.2px, transparent 2.4px),
+    radial-gradient(circle, rgba(255,255,255,0.16) 0 0.9px, transparent 2.0px);
+
+  background-size:
+    110px 150px,
+    80px 120px,
+    55px 95px;
+
+  background-position:
+    0 -220px,
+    30px -340px,
+    14px -180px;
+
+  filter: blur(0.15px);
+  animation: rainDropsFall 0.9s linear infinite;
 }
 
-@keyframes rainStreaksFall {
-  0%   { transform: translate3d(0, -40px, 0); }
-  100% { transform: translate3d(0, 220px, 0); }
+@keyframes rainDropsFall {
+  0% {
+    background-position:
+      0 -260px,
+      30px -420px,
+      14px -240px;
+  }
+  100% {
+    background-position:
+      -25px 260px,
+      10px 220px,
+      -18px 320px;
+  }
 }
 
 /* ---------------------------
-   SNOW: gentle falling flakes
+   SNOW: flakes using ::before only (NO HTML change)
 ---------------------------- */
 .background-overlay.background-snow::before{
   content: "";
   position: fixed;
-  inset: -10%;
+  inset: -20%;
   pointer-events: none;
   z-index: 0;
-  opacity: 0.40;
+  opacity: 0.60;
+
   background-image:
-    radial-gradient(circle, rgba(255,255,255,0.85) 0 1px, transparent 2px),
-    radial-gradient(circle, rgba(255,255,255,0.70) 0 1px, transparent 2px),
-    radial-gradient(circle, rgba(255,255,255,0.60) 0 1px, transparent 2px);
-  background-size: 180px 180px, 240px 240px, 320px 320px;
-  background-position: 0 0, 60px 120px, 120px 60px;
-  filter: blur(0.2px);
-  animation: snowFall 10s linear infinite;
+    radial-gradient(circle, rgba(255,255,255,0.95) 0 1.6px, transparent 3.2px),
+    radial-gradient(circle, rgba(255,255,255,0.80) 0 1.2px, transparent 2.8px),
+    radial-gradient(circle, rgba(255,255,255,0.65) 0 1px, transparent 2.5px);
+
+  background-size:
+    160px 160px,
+    240px 240px,
+    320px 320px;
+
+  background-position:
+    0 -200px,
+    80px -360px,
+    140px -280px;
+
+  filter: blur(0.15px);
+  animation: snowFallLayers 14s linear infinite;
 }
 
-@keyframes snowFall {
-  0%   { transform: translate3d(0, -12%, 0); }
-  100% { transform: translate3d(-3%, 12%, 0); }
+@keyframes snowFallLayers{
+  0%{
+    background-position:
+      0 -260px,
+      80px -520px,
+      140px -420px;
+  }
+  100%{
+    background-position:
+      -60px 320px,
+      30px 260px,
+      -10px 360px;
+  }
 }
 
 /* ---------------------------
-   THUNDERSTORM: heavy rain + lightning flash
-   (Lightning uses box-shadow-like flash via animation on ::before)
+   THUNDERSTORM: heavier droplets + lightning (no lines)
 ---------------------------- */
 .background-overlay.background-thunderstorm::before{
   content: "";
   position: fixed;
-  inset: 0;
+  inset: -20%;
   pointer-events: none;
   z-index: 0;
-  opacity: 0.50;
+  opacity: 0.70;
+
   background-image:
-    repeating-linear-gradient(
-      115deg,
-      rgba(255,255,255,0.22) 0px,
-      rgba(255,255,255,0.22) 1px,
-      transparent 1px,
-      transparent 8px
-    );
-  filter: blur(0.35px);
-  animation: stormRain 0.7s linear infinite, lightningFlash 7s ease-in-out infinite;
+    radial-gradient(circle, rgba(255,255,255,0.36) 0 1.9px, transparent 3.2px),
+    radial-gradient(circle, rgba(255,255,255,0.24) 0 1.3px, transparent 2.6px),
+    radial-gradient(circle, rgba(255,255,255,0.14) 0 0.9px, transparent 2.1px);
+
+  background-size:
+    95px 135px,
+    70px 110px,
+    55px 95px;
+
+  background-position:
+    0 -320px,
+    25px -520px,
+    10px -260px;
+
+  filter: blur(0.12px);
+  animation: stormDropsFall 0.65s linear infinite, lightningFlash 7s ease-in-out infinite;
 }
 
-@keyframes stormRain {
-  0%   { transform: translate3d(0, -60px, 0); }
-  100% { transform: translate3d(0, 280px, 0); }
+@keyframes stormDropsFall{
+  0%{
+    background-position:
+      0 -420px,
+      25px -700px,
+      10px -420px;
+  }
+  100%{
+    background-position:
+      -40px 360px,
+      0px 260px,
+      -25px 420px;
+  }
 }
 
 /* Random-ish lightning pulses */
 @keyframes lightningFlash {
   0%, 92%, 100% { box-shadow: inset 0 0 0 0 rgba(255,255,255,0); }
-  93%           { box-shadow: inset 0 0 0 9999px rgba(255,255,255,0.14); }
+  93%           { box-shadow: inset 0 0 0 9999px rgba(255,255,255,0.12); }
   93.7%         { box-shadow: inset 0 0 0 0 rgba(255,255,255,0); }
-  94.2%         { box-shadow: inset 0 0 0 9999px rgba(255,255,255,0.22); }
+  94.2%         { box-shadow: inset 0 0 0 9999px rgba(255,255,255,0.20); }
   94.8%         { box-shadow: inset 0 0 0 0 rgba(255,255,255,0); }
 }
 
 /* ---------------------------
-   NIGHT: subtle moving stars
+   NIGHT: stars + subtle twinkle
 ---------------------------- */
 .background-overlay.background-night::before{
   content: "";
@@ -240,19 +298,24 @@
   inset: -20%;
   pointer-events: none;
   z-index: 0;
-  opacity: 0.40;
+  opacity: 0.45;
   background-image:
-    radial-gradient(circle at 10% 15%, rgba(255,255,255,0.7) 0 1px, transparent 2px),
+    radial-gradient(circle at 10% 15%, rgba(255,255,255,0.75) 0 1px, transparent 2px),
     radial-gradient(circle at 35% 30%, rgba(255,255,255,0.55) 0 1px, transparent 2px),
-    radial-gradient(circle at 60% 18%, rgba(255,255,255,0.6) 0 1px, transparent 2px),
-    radial-gradient(circle at 80% 40%, rgba(255,255,255,0.5) 0 1px, transparent 2px),
+    radial-gradient(circle at 60% 18%, rgba(255,255,255,0.60) 0 1px, transparent 2px),
+    radial-gradient(circle at 80% 40%, rgba(255,255,255,0.50) 0 1px, transparent 2px),
     radial-gradient(circle at 25% 70%, rgba(255,255,255,0.45) 0 1px, transparent 2px),
     radial-gradient(circle at 70% 75%, rgba(255,255,255,0.55) 0 1px, transparent 2px);
   background-size: 420px 420px;
-  animation: starsDrift 22s linear infinite;
+  animation: starsDrift 26s linear infinite, starsTwinkle 5.5s ease-in-out infinite;
 }
 
 @keyframes starsDrift {
   0%   { transform: translate3d(0, 0, 0); }
   100% { transform: translate3d(-4%, 3%, 0); }
+}
+
+@keyframes starsTwinkle {
+  0%, 100% { opacity: 0.35; filter: blur(0px); }
+  50%      { opacity: 0.55; filter: blur(0.25px); }
 }
