@@ -3,14 +3,17 @@ import SearchBar from './SearchBar';
 import WeatherInfo from './WeatherInfo';
 import RecentSearches from './RecentSearches';
 import { getCachedData, setCachedData, clearOldCache } from '../utils/cache';
-import { searchCities, getWeatherData, getWeatherByCoordinates } from '../utils/api';
+import { searchCities, getWeatherData, getForecastByCoordinates, getOneCallByCoordinates } from '../utils/api';
 
 import WeatherAgent from './WeatherAgent';
 import WeatherActions from './WeatherActions';
-import WeatherInsights from './WeatherInsights';
+
+import ProactiveIntelligence from './ProactiveIntelligence';
+import CalendarFusion from './CalendarFusion';
 
 const WeatherApp = () => {
-  const [weatherData, setWeatherData] = useState(null);
+  const [weatherData, setWeatherData] = useState(null); // forecast shape
+  const [oneCall, setOneCall] = useState(null); // optional UV
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(true);
   const [selectedCity, setSelectedCity] = useState('');
@@ -19,9 +22,22 @@ const WeatherApp = () => {
     return saved ? JSON.parse(saved) : [];
   });
 
-  // This allows Actions to trigger a message inside WeatherAgent
   const agentRef = useRef(null);
   const overlayRef = useRef(null);
+
+  const addToRecentSearches = (cityName) => {
+    setRecentSearches((prev) => {
+      const filtered = prev.filter((city) => city !== cityName);
+      const updated = [cityName, ...filtered].slice(0, 5);
+      localStorage.setItem('recentSearches', JSON.stringify(updated));
+      return updated;
+    });
+  };
+
+  const clearRecentSearches = () => {
+    setRecentSearches([]);
+    localStorage.removeItem('recentSearches');
+  };
 
   const handleWeatherSearch = async (city) => {
     setLoading(true);
@@ -53,58 +69,48 @@ const WeatherApp = () => {
     setLoading(true);
     setError(null);
 
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        async (position) => {
-          const { latitude, longitude } = position.coords;
-          try {
-            const data = await getWeatherByCoordinates(latitude, longitude);
-
-            // sets city + weather quickly
-            setWeatherData(data);
-            setSelectedCity(data.name);
-
-            // triggers forecast fetch (your existing logic)
-            handleWeatherSearch(data.name);
-
-            setError(null);
-          } catch (err) {
-            setError('Could not fetch weather data for your location.');
-            setWeatherData(null);
-          } finally {
-            setLoading(false);
-          }
-        },
-        () => {
-          setError('Location access denied. Please enable location access.');
-          setLoading(false);
-        }
-      );
-    } else {
+    if (!navigator.geolocation) {
       setError('Geolocation is not supported by your browser.');
       setLoading(false);
+      return;
     }
+
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        const { latitude, longitude } = position.coords;
+
+        try {
+          // ✅ IMPORTANT: fetch forecast shape directly
+          const forecast = await getForecastByCoordinates(latitude, longitude);
+          setWeatherData(forecast);
+          setSelectedCity(forecast.city?.name || "");
+
+          // Optional UV (if key/plan supports One Call)
+          try {
+            const oc = await getOneCallByCoordinates(latitude, longitude);
+            setOneCall(oc);
+          } catch {
+            setOneCall(null);
+          }
+
+          setError(null);
+        } catch (err) {
+          setError('Could not fetch weather data for your location.');
+          setWeatherData(null);
+          setOneCall(null);
+        } finally {
+          setLoading(false);
+        }
+      },
+      () => {
+        setError('Location access denied. Please enable location access.');
+        setLoading(false);
+      }
+    );
   };
 
-  const addToRecentSearches = (cityName) => {
-    setRecentSearches((prev) => {
-      const filtered = prev.filter((city) => city !== cityName);
-      const updated = [cityName, ...filtered].slice(0, 5);
-      localStorage.setItem('recentSearches', JSON.stringify(updated));
-      return updated;
-    });
-  };
-
-  const clearRecentSearches = () => {
-    setRecentSearches([]);
-    localStorage.removeItem('recentSearches');
-  };
-
-  // Actions -> Agent
   const handleActionPrompt = (promptText) => {
     if (!promptText) return;
-
-    // If agentRef exists, call the exposed method
     if (agentRef.current && agentRef.current.sendPrompt) {
       agentRef.current.sendPrompt(promptText);
     }
@@ -155,14 +161,24 @@ const WeatherApp = () => {
             </div>
           ) : (
             <div className="main-layout">
-              {/* LEFT SIDE: WEATHER + CHARTS + HOURLY */}
+              {/* LEFT SIDE */}
               <div>
                 {weatherData && <WeatherInfo data={weatherData} overlayRef={overlayRef}/>}
               </div>
 
-              {/* RIGHT SIDE: UTILITY RAIL */}
+              {/* RIGHT SIDE */}
               <div className="right-rail">
-                {/* 1) AI */}
+                {/* Proactive Intelligence */}
+                <div className="rail-card insights-card">
+                  <ProactiveIntelligence forecastData={weatherData} oneCallData={oneCall} demoMode={true}/>
+                </div>
+
+                {/* Calendar Fusion */}
+                <div className="rail-card insights-card">
+                  <CalendarFusion forecastData={weatherData} />
+                </div>
+
+                {/* AI */}
                 <div className="rail-card ai-card">
                   <WeatherAgent
                     ref={agentRef}
@@ -171,15 +187,10 @@ const WeatherApp = () => {
                   />
                 </div>
 
-                {/* 2) Actions */}
+                {/* Actions */}
                 <div className="rail-card actions-card">
                   <WeatherActions onAction={handleActionPrompt} />
                 </div>
-
-                {/* 3) Insights */}
-                {/* <div className="rail-card insights-card">
-                  <WeatherInsights weatherData={weatherData} />
-                </div> */}
               </div>
             </div>
           )}

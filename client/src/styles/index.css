@@ -231,17 +231,31 @@ body {
     align-items: start;
 }
 
-/* Right rail (sticky + full height, no empty space) */
+/* Right rail (sticky + scrolls internally when it overflows) */
 .right-rail {
-  position: sticky;
-  top: 40px;
-  height: calc(100vh - 120px);
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  min-height: 0; 
+    position: sticky;
+    top: 40px;
+
+    /* Use max-height, not fixed height */
+    max-height: calc(100vh - 120px);
+
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+
+    /* Allow rail to scroll instead of clipping */
+    overflow-y: auto;
+    padding-right: 6px; /* space for scrollbar */
+    min-height: 0;
 }
 
+/* Optional: nicer scrollbar */
+.right-rail::-webkit-scrollbar { width: 8px; }
+.right-rail::-webkit-scrollbar-thumb {
+    background: rgba(0,0,0,0.18);
+    border-radius: 999px;
+}
+.right-rail::-webkit-scrollbar-track { background: transparent; }
 
 /* A reusable card style for AI / Actions / Insights */
 .rail-card {
@@ -252,73 +266,72 @@ body {
     overflow: hidden;
 }
 
-/* AI card should flex to fill remaining height */
+/* AI card should flex to fill remaining height (but not force huge min-height) */
 .rail-card.ai-card {
-  flex: 1 1 auto;
-  display: flex;
-  flex-direction: column;
-  min-height: 340px;     
+    flex: 2 1 auto;
+    display: flex;
+    flex-direction: column;
+    min-height: 420px;
 }
 
 .rail-card.actions-card {
-  flex: 0 0 auto;
-  padding-bottom: 12px;
+    flex: 0 0 auto;
+    padding-bottom: 12px;
 }
 
 .rail-card.insights-card {
-  flex: 0 0 auto;
-  max-height: 210px;
-  overflow: auto;
+    flex: 0 0 auto;
+    max-height: none;
+    overflow: visible;
 }
 
 .insights-kpi-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr; 
-  gap: 10px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
 }
 
 .kpi-tile {
-  background: rgba(255,255,255,0.7);
-  border: 1px solid #eee;
-  border-radius: 12px;
-  padding: 10px;
-  min-height: 78px; 
+    background: rgba(255,255,255,0.7);
+    border: 1px solid #eee;
+    border-radius: 12px;
+    padding: 10px;
+    min-height: 78px;
 }
 
 .kpi-top {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 6px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 6px;
 }
 
 .kpi-ico {
-  font-size: 16px;
-  line-height: 1;
+    font-size: 16px;
+    line-height: 1;
 }
 
 .kpi-label {
-  font-size: 12px;
-  color: #666;
-  font-weight: 600;
+    font-size: 12px;
+    color: #666;
+    font-weight: 600;
 }
 
 .kpi-value {
-  font-size: 16px;
-  font-weight: 700;
-  color: #1e3c72;
-  line-height: 1.2;
+    font-size: 16px;
+    font-weight: 700;
+    color: #1e3c72;
+    line-height: 1.2;
 }
 
 .kpi-sub {
-  font-size: 11px;
-  color: #777;
-  margin-top: 2px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+    font-size: 11px;
+    color: #777;
+    margin-top: 2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
-
 
 /* Card header */
 .rail-header {
@@ -710,7 +723,9 @@ body {
 
     .right-rail {
         position: static;
-        height: auto;
+        max-height: none;
+        overflow-y: visible;
+        padding-right: 0;
     }
 
     .charts-grid {
@@ -782,10 +797,57 @@ body {
     background: rgba(0,0,0,0.15);
 }
 
-
 .button-container {
     display: flex;
     align-items: center;
     justify-content: center;
     width: 100%;
+}
+
+/* Calendar Fusion */
+.calendar-form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.calendar-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.calendar-item {
+    background: rgba(255,255,255,0.7);
+    border: 1px solid #eee;
+    border-radius: 12px;
+    padding: 12px;
+}
+
+.calendar-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+}
+
+.calendar-title {
+    font-weight: 700;
+    color: #1e3c72;
+}
+
+.calendar-when {
+    font-size: 12px;
+    color: #666;
+    margin-top: 4px;
+}
+
+.calendar-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 8px;
+    font-size: 12px;
+    color: #444;
 }
