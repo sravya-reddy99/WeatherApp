@@ -41,7 +41,6 @@ export default function WeatherInsights({ weatherData }) {
     const visibilityKm =
       typeof first?.visibility === "number" ? (first.visibility / 1000).toFixed(1) : null;
 
-    // outdoor score (simple)
     let score = 10;
     score -= popMax >= 60 ? 4 : popMax >= 30 ? 2 : popMax >= 10 ? 1 : 0;
     score -= windKmh >= 35 ? 2 : windKmh >= 20 ? 1 : 0;

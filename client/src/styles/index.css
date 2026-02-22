@@ -249,7 +249,7 @@ body {
     min-height: 0;
 }
 
-/* Optional: nicer scrollbar */
+/* nicer scrollbar */
 .right-rail::-webkit-scrollbar { width: 8px; }
 .right-rail::-webkit-scrollbar-thumb {
     background: rgba(0,0,0,0.18);
@@ -266,7 +266,7 @@ body {
     overflow: hidden;
 }
 
-/* AI card should flex to fill remaining height (but not force huge min-height) */
+/* AI card */
 .rail-card.ai-card {
     flex: 2 1 auto;
     display: flex;
@@ -369,7 +369,7 @@ body {
     background: #f5f5f5;
 }
 
-/* AI chat body - no fixed height; flex fills */
+/* AI chat body */
 .ai-messages {
     background: rgba(255,255,255,0.7);
     border: 1px solid #eee;
@@ -377,7 +377,7 @@ body {
     padding: 12px;
     flex: 1;
     overflow-y: auto;
-    min-height: 0; /* critical */
+    min-height: 0;
 }
 
 .ai-msg {
@@ -483,7 +483,7 @@ body {
     margin-top: 6px;
 }
 
-/* ✅ Charts */
+/* Charts */
 .charts-section {
     margin-top: 24px;
 }
@@ -850,4 +850,124 @@ body {
     margin-top: 8px;
     font-size: 12px;
     color: #444;
+}
+
+.globe-page {
+  position: relative;
+  min-height: 100vh;
+  overflow: hidden;
+
+  /* Deep space gradient */
+  background:
+    radial-gradient(circle at 20% 30%, rgba(90,120,255,0.25), transparent 60%),
+    radial-gradient(circle at 80% 70%, rgba(255,120,200,0.18), transparent 60%),
+    linear-gradient(180deg, #050814 0%, #0b1025 60%, #070a14 100%);
+}
+
+/* Subtle animated stars layer */
+.globe-page::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.4;
+
+  background-image:
+    radial-gradient(circle at 10% 15%, rgba(255,255,255,0.8) 0 1px, transparent 2px),
+    radial-gradient(circle at 35% 40%, rgba(255,255,255,0.6) 0 1px, transparent 2px),
+    radial-gradient(circle at 60% 20%, rgba(255,255,255,0.7) 0 1px, transparent 2px),
+    radial-gradient(circle at 80% 60%, rgba(255,255,255,0.6) 0 1px, transparent 2px),
+    radial-gradient(circle at 25% 75%, rgba(255,255,255,0.5) 0 1px, transparent 2px);
+
+  background-size: 500px 500px;
+  animation: starsDrift 40s linear infinite;
+}
+
+@keyframes starsDrift {
+  0%   { transform: translate3d(0, 0, 0); }
+  100% { transform: translate3d(-5%, 3%, 0); }
+}
+
+/* Top Bar Glass Effect */
+.globe-topbar {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  right: 16px;
+  z-index: 10;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  background: rgba(255,255,255,0.08);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 18px;
+  padding: 14px 18px;
+}
+
+.globe-h1 {
+  font-size: 18px;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.globe-subtitle {
+  font-size: 12px;
+  color: rgba(255,255,255,0.75);
+  margin-top: 2px;
+}
+
+.globe-btn {
+  background: linear-gradient(135deg, #4aa3ff, #2a5298);
+  color: #fff;
+  border: none;
+  border-radius: 14px;
+  padding: 10px 14px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.globe-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(74,163,255,0.4);
+}
+
+/* Globe container */
+.globe-wrap {
+  height: 100vh;
+  width: 100vw;
+}
+
+/* Bottom hint */
+.globe-hint {
+  position: absolute;
+  bottom: 16px;
+  left: 16px;
+  z-index: 10;
+
+  background: rgba(255,255,255,0.08);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 14px;
+  padding: 10px 14px;
+  font-size: 12px;
+  color: rgba(255,255,255,0.8);
+}
+
+.globe-hover {
+  position: absolute;
+  bottom: 16px;
+  right: 16px;
+  z-index: 10;
+
+  background: rgba(255,255,255,0.08);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 14px;
+  padding: 10px 14px;
+  font-size: 12px;
+  color: rgba(255,255,255,0.8);
 }

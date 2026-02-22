@@ -1,24 +1,38 @@
-import React, { useState, useEffect, useRef } from 'react';
-import SearchBar from './SearchBar';
-import WeatherInfo from './WeatherInfo';
-import RecentSearches from './RecentSearches';
-import { getCachedData, setCachedData, clearOldCache } from '../utils/cache';
-import { searchCities, getWeatherData, getForecastByCoordinates, getOneCallByCoordinates } from '../utils/api';
+import React, { useState, useEffect, useRef } from "react";
+import { useLocation } from "react-router-dom";
 
-import WeatherAgent from './WeatherAgent';
-import WeatherActions from './WeatherActions';
+import SearchBar from "./SearchBar";
+import WeatherInfo from "./WeatherInfo";
+import RecentSearches from "./RecentSearches";
+import { getCachedData, setCachedData, clearOldCache } from "../utils/cache";
+import {
+  searchCities,
+  getWeatherData,
+  getForecastByCoordinates,
+  getOneCallByCoordinates
+} from "../utils/api";
 
-import ProactiveIntelligence from './ProactiveIntelligence';
-import CalendarFusion from './CalendarFusion';
+import WeatherAgent from "./WeatherAgent";
+import WeatherActions from "./WeatherActions";
+
+import ProactiveIntelligence from "./ProactiveIntelligence";
+import CalendarFusion from "./CalendarFusion";
+
+function useQuery() {
+  const { search } = useLocation();
+  return new URLSearchParams(search);
+}
 
 const WeatherApp = () => {
+  const query = useQuery();
+
   const [weatherData, setWeatherData] = useState(null); // forecast shape
   const [oneCall, setOneCall] = useState(null); // optional UV
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [selectedCity, setSelectedCity] = useState('');
+  const [selectedCity, setSelectedCity] = useState("");
   const [recentSearches, setRecentSearches] = useState(() => {
-    const saved = localStorage.getItem('recentSearches');
+    const saved = localStorage.getItem("recentSearches");
     return saved ? JSON.parse(saved) : [];
   });
 
@@ -29,14 +43,14 @@ const WeatherApp = () => {
     setRecentSearches((prev) => {
       const filtered = prev.filter((city) => city !== cityName);
       const updated = [cityName, ...filtered].slice(0, 5);
-      localStorage.setItem('recentSearches', JSON.stringify(updated));
+      localStorage.setItem("recentSearches", JSON.stringify(updated));
       return updated;
     });
   };
 
   const clearRecentSearches = () => {
     setRecentSearches([]);
-    localStorage.removeItem('recentSearches');
+    localStorage.removeItem("recentSearches");
   };
 
   const handleWeatherSearch = async (city) => {
@@ -57,9 +71,34 @@ const WeatherApp = () => {
       setWeatherData(data);
       addToRecentSearches(city);
       setError(null);
-    } catch (error) {
+    } catch (e) {
       setError("City not found. Please try again.");
       setWeatherData(null);
+      setOneCall(null);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchForecastByLatLon = async (lat, lon) => {
+    setLoading(true);
+    setError(null);
+
+    try {
+      const forecast = await getForecastByCoordinates(lat, lon);
+      setWeatherData(forecast);
+      setSelectedCity(forecast.city?.name || "");
+
+      try {
+        const oc = await getOneCallByCoordinates(lat, lon);
+        setOneCall(oc);
+      } catch {
+        setOneCall(null);
+      }
+    } catch {
+      setError("Could not fetch weather data for that location.");
+      setWeatherData(null);
+      setOneCall(null);
     } finally {
       setLoading(false);
     }
@@ -70,7 +109,7 @@ const WeatherApp = () => {
     setError(null);
 
     if (!navigator.geolocation) {
-      setError('Geolocation is not supported by your browser.');
+      setError("Geolocation is not supported by your browser.");
       setLoading(false);
       return;
     }
@@ -78,32 +117,10 @@ const WeatherApp = () => {
     navigator.geolocation.getCurrentPosition(
       async (position) => {
         const { latitude, longitude } = position.coords;
-
-        try {
-          // ✅ IMPORTANT: fetch forecast shape directly
-          const forecast = await getForecastByCoordinates(latitude, longitude);
-          setWeatherData(forecast);
-          setSelectedCity(forecast.city?.name || "");
-
-          // Optional UV (if key/plan supports One Call)
-          try {
-            const oc = await getOneCallByCoordinates(latitude, longitude);
-            setOneCall(oc);
-          } catch {
-            setOneCall(null);
-          }
-
-          setError(null);
-        } catch (err) {
-          setError('Could not fetch weather data for your location.');
-          setWeatherData(null);
-          setOneCall(null);
-        } finally {
-          setLoading(false);
-        }
+        await fetchForecastByLatLon(latitude, longitude);
       },
       () => {
-        setError('Location access denied. Please enable location access.');
+        setError("Location access denied. Please enable location access.");
         setLoading(false);
       }
     );
@@ -117,14 +134,25 @@ const WeatherApp = () => {
   };
 
   useEffect(() => {
+    const lat = query.get("lat");
+    const lon = query.get("lon");
+
+    if (lat && lon && !Number.isNaN(Number(lat)) && !Number.isNaN(Number(lon))) {
+      fetchForecastByLatLon(Number(lat), Number(lon));
+      return;
+    }
+
     fetchWeatherByLocation();
+  }, []);
+
+  useEffect(() => {
     const interval = setInterval(clearOldCache, 30 * 60 * 1000);
     return () => clearInterval(interval);
   }, []);
 
   return (
     <div className="min-h-screen">
-      <div className="background-overlay" ref={overlayRef}/>
+      <div className="background-overlay" ref={overlayRef} />
       <div className="dashboard">
         {/* LEFT SIDEBAR */}
         <div className="sidebar">
@@ -151,8 +179,8 @@ const WeatherApp = () => {
         <div className="main-content">
           {loading ? (
             <div className="landing-message fadeIn">
-              <h2>Welcome to the ForecastIQ</h2>
-              <p>Fetching weather data for your location...</p>
+              <h2>Welcome to ForecastIQ</h2>
+              <p>Fetching weather data...</p>
             </div>
           ) : error ? (
             <div className="not-found fadeIn">
@@ -162,32 +190,26 @@ const WeatherApp = () => {
           ) : (
             <div className="main-layout">
               {/* LEFT SIDE */}
-              <div>
-                {weatherData && <WeatherInfo data={weatherData} overlayRef={overlayRef}/>}
-              </div>
+              <div>{weatherData && <WeatherInfo data={weatherData} overlayRef={overlayRef} />}</div>
 
               {/* RIGHT SIDE */}
               <div className="right-rail">
-                {/* Proactive Intelligence */}
                 <div className="rail-card insights-card">
-                  <ProactiveIntelligence forecastData={weatherData} oneCallData={oneCall} demoMode={true}/>
+                  <ProactiveIntelligence
+                    forecastData={weatherData}
+                    oneCallData={oneCall}
+                    demoMode={true}
+                  />
                 </div>
 
-                {/* Calendar Fusion */}
                 <div className="rail-card insights-card">
                   <CalendarFusion forecastData={weatherData} />
                 </div>
 
-                {/* AI */}
                 <div className="rail-card ai-card">
-                  <WeatherAgent
-                    ref={agentRef}
-                    weatherData={weatherData}
-                    selectedCity={selectedCity}
-                  />
+                  <WeatherAgent ref={agentRef} weatherData={weatherData} selectedCity={selectedCity} />
                 </div>
 
-                {/* Actions */}
                 <div className="rail-card actions-card">
                   <WeatherActions onAction={handleActionPrompt} />
                 </div>

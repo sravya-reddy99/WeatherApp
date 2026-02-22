@@ -66,7 +66,6 @@ const WeatherAgent = forwardRef(function WeatherAgent({ weatherData, selectedCit
     }
   };
 
-  // Expose methods to parent (WeatherApp -> WeatherActions)
   useImperativeHandle(ref, () => ({
     sendPrompt: (promptText) => {
       sendMessage(promptText);

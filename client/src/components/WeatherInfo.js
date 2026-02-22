@@ -1,4 +1,3 @@
-// WeatherInfo.js
 import React, { useEffect, useMemo } from "react";
 import WeatherCharts from "./WeatherCharts";
 
@@ -45,8 +44,8 @@ function formatCityTime(dtSeconds, cityTzOffsetSeconds) {
   const utcMs = dtSeconds * 1000;
   const cityMs = utcMs + (cityTzOffsetSeconds ?? 0) * 1000;
 
-  // IMPORTANT: use timeZone:"UTC" so the formatted output doesn't get re-shifted
-  // into the user's browser timezone (we already applied the city offset).
+  // use timeZone:"UTC" so the formatted output doesn't get re-shifted
+  // into the user's browser timezone.
   return new Date(cityMs).toLocaleTimeString("en-US", {
     hour: "numeric",
     minute: "2-digit",
@@ -84,7 +83,6 @@ const WeatherInfo = ({ data, overlayRef }) => {
     }
   }, [data, overlayRef]);
 
-  // Always call hooks (no conditional hook call)
   const insights = useMemo(() => {
     if (!data || !data.list || data.list.length === 0) {
       return { outdoorScoreText: "—", nextChangeText: "—", nextChangeSubText: "—" };
@@ -93,7 +91,6 @@ const WeatherInfo = ({ data, overlayRef }) => {
     const list = data.list;
     const cityTz = data.city?.timezone ?? 0;
 
-    // next ~6 hours (2 x 3h)
     const next6 = list.slice(0, 2);
     const popMax6h = Math.max(
       ...next6.map((x) => (typeof x.pop === "number" ? x.pop * 100 : 0))
@@ -120,7 +117,6 @@ const WeatherInfo = ({ data, overlayRef }) => {
 
     const outdoorScoreText = `${outdoorScore}/10`;
 
-    // Next change in weather "main"
     const currentMain = list[0]?.weather?.[0]?.main || "";
     let nextChangeText = "—";
     let nextChangeSubText = "—";

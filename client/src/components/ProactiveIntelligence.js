@@ -1,4 +1,3 @@
-// components/ProactiveIntelligence.js
 import React, { useEffect, useMemo, useState } from "react";
 import { findRainStart, minutesUntil } from "../utils/proactive";
 
@@ -18,7 +17,7 @@ export default function ProactiveIntelligence({ forecastData, oneCallData, demoM
     typeof Notification !== "undefined" && Notification.permission === "granted"
   );
 
-  // Small UI state to show "in-app" toast style alert
+  // UI state to show "in-app" toast style alert
   const [toast, setToast] = useState(null);
 
   const cityTz = forecastData?.city?.timezone ?? 0;
@@ -30,11 +29,11 @@ export default function ProactiveIntelligence({ forecastData, oneCallData, demoM
   };
 
   const fireNotification = (title, body) => {
-    // In-app toast (works even without permission)
+    // In-app toast
     setToast({ title, body });
     setTimeout(() => setToast(null), 4500);
 
-    // Desktop notification (requires permission)
+    // Desktop notification
     if (typeof Notification !== "undefined" && Notification.permission === "granted") {
       new Notification(title, { body });
     }
@@ -58,8 +57,8 @@ export default function ProactiveIntelligence({ forecastData, oneCallData, demoM
     let rainText = "No significant rain expected soon.";
 
     if (demoMode) {
-      // For demo: force a near-term alert so you can show it instantly
-      rainMinutes = 3; // change to 1 or 2 if you want faster
+      // For demo: force a near-term alert 
+      rainMinutes = 3;
       rainAtText = "in ~3 minutes";
       rainText = "Rain starts in ~3 minutes (Demo Mode).";
     } else if (rainSlot) {
@@ -104,7 +103,7 @@ export default function ProactiveIntelligence({ forecastData, oneCallData, demoM
     if (sessionStorage.getItem(key)) return;
     sessionStorage.setItem(key, "1");
 
-    // In demo mode, show quickly so it looks alive
+    // In demo mode
     const delayMs = demoMode ? 1500 : 0;
 
     setTimeout(() => {

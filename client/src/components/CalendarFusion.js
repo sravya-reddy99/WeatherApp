@@ -1,4 +1,3 @@
-// components/CalendarFusion.js
 import React, { useMemo, useState } from "react";
 import { pickForecastForTime, computeCommuteAdvice } from "../utils/proactive";
 
